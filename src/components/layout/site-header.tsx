@@ -1,6 +1,8 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { BagIcon, SearchIcon, UserIcon } from "@/components/icons";
 import { MobileMenu } from "@/components/layout/mobile-menu";
+import { getBag } from "@/lib/bag";
 import { navigation } from "@/lib/sample-data";
 
 export function SiteHeader() {
@@ -47,12 +49,39 @@ export function SiteHeader() {
             >
               <UserIcon />
             </Link>
-            <Link href="/bag" className="btn-icon" aria-label="Shopping bag">
-              <BagIcon />
-            </Link>
+            {/* The bag is a cookie: read it inside Suspense so the shell stays static */}
+            <Suspense fallback={<BagLink count={0} />}>
+              <BagLinkWithCount />
+            </Suspense>
           </div>
         </div>
       </header>
     </>
+  );
+}
+
+// Same count as the bag page: purchasable pieces of products still in the catalogue
+async function BagLinkWithCount() {
+  const { itemCount } = await getBag();
+  return <BagLink count={itemCount} />;
+}
+
+function BagLink({ count }: { count: number }) {
+  return (
+    <Link
+      href="/bag"
+      className="btn-icon relative"
+      aria-label={count > 0 ? `Shopping bag, ${count} ${count === 1 ? "item" : "items"}` : "Shopping bag"}
+    >
+      <BagIcon />
+      {count > 0 && (
+        <span
+          aria-hidden="true"
+          className="absolute top-0.5 right-0 grid h-4 min-w-4 place-items-center rounded-full bg-error px-1 text-[0.625rem] leading-none font-medium text-white tabular-nums"
+        >
+          {count > 99 ? "99+" : count}
+        </span>
+      )}
+    </Link>
   );
 }

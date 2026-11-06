@@ -6,6 +6,7 @@ export type SeedProduct = {
   slug: string;
   name: string;
   category: string; // category slug
+  department: "women" | "men" | "unisex"; // unisex is listed under both
   price: number; // USD cents
   stock: number;
   image: { src: string; alt: string };
@@ -33,6 +34,7 @@ export const seedProducts: SeedProduct[] = [
     slug: "chevron-chain-shoulder-bag",
     name: "Chevron Chain Shoulder Bag",
     category: "bags",
+    department: "women",
     price: 145000,
     stock: 12,
     badge: "New",
@@ -56,6 +58,7 @@ export const seedProducts: SeedProduct[] = [
     slug: "cropped-leather-biker-jacket",
     name: "Cropped Leather Biker Jacket",
     category: "ready-to-wear",
+    department: "women",
     price: 320000,
     stock: 3,
     image: {
@@ -78,6 +81,7 @@ export const seedProducts: SeedProduct[] = [
     slug: "twisted-gold-hoop-earrings",
     name: "Twisted Gold Hoop Earrings",
     category: "jewelry",
+    department: "women",
     price: 62000,
     stock: 0,
     badge: "New",
@@ -99,6 +103,7 @@ export const seedProducts: SeedProduct[] = [
     slug: "top-handle-satchel",
     name: "Top Handle Satchel",
     category: "bags",
+    department: "women",
     price: 189000,
     stock: 7,
     image: {
@@ -120,6 +125,7 @@ export const seedProducts: SeedProduct[] = [
     slug: "technical-bomber-jacket",
     name: "Technical Bomber Jacket",
     category: "ready-to-wear",
+    department: "men",
     price: 165000,
     stock: 9,
     image: {
@@ -141,6 +147,7 @@ export const seedProducts: SeedProduct[] = [
     slug: "round-metal-sunglasses",
     name: "Round Metal Sunglasses",
     category: "accessories",
+    department: "unisex",
     price: 48000,
     stock: 2,
     image: {
@@ -161,6 +168,7 @@ export const seedProducts: SeedProduct[] = [
     slug: "colorblock-runner-sneaker",
     name: "Colorblock Runner Sneaker",
     category: "shoes",
+    department: "unisex",
     price: 98000,
     stock: 15,
     badge: "New",
@@ -182,6 +190,7 @@ export const seedProducts: SeedProduct[] = [
     slug: "minimal-leather-strap-watch",
     name: "Minimal Leather Strap Watch",
     category: "watches",
+    department: "unisex",
     price: 115000,
     stock: 5,
     image: {

@@ -1,6 +1,6 @@
 // Catalogue access. Reads products from Postgres; components only ever see the
 // Product shape below, never raw DB rows.
-import { desc, eq, ne, sql } from "drizzle-orm";
+import { desc, eq, inArray, ne, sql } from "drizzle-orm";
 import { cacheLife, cacheTag } from "next/cache";
 import { db } from "@/db";
 import { categories, products } from "@/db/schema";
@@ -91,6 +91,48 @@ export async function getProductSlugs() {
   return rows.map((row) => row.slug);
 }
 
+export async function getCategorySlugs() {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("products");
+
+  const rows = await db.select({ slug: categories.slug }).from(categories);
+  return rows.map((row) => row.slug);
+}
+
+// The department's products plus unisex pieces, newest first
+export async function getDepartmentProducts(department: "women" | "men") {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("products");
+
+  const rows = await db.query.products.findMany({
+    where: inArray(products.department, [department, "unisex"]),
+    with: { category: true },
+    orderBy: [desc(products.createdAt)],
+  });
+  return rows.map(toProduct);
+}
+
+// The category with its products, newest first; undefined for unknown slugs
+export async function getCategoryWithProducts(slug: string) {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("products");
+
+  const category = await db.query.categories.findFirst({
+    where: eq(categories.slug, slug),
+    with: { products: { orderBy: [desc(products.createdAt)] } },
+  });
+  if (!category) return undefined;
+
+  const { products: rows, ...rest } = category;
+  return {
+    category: { slug: rest.slug, name: rest.name } satisfies Category,
+    products: rows.map((row) => toProduct({ ...row, category: rest })),
+  };
+}
+
 export async function getProductBySlug(slug: string) {
   "use cache";
   cacheLife("hours");
@@ -101,6 +143,20 @@ export async function getProductBySlug(slug: string) {
     with: { category: true },
   });
   return row ? toProduct(row) : undefined;
+}
+
+// Products for the given slugs (unknown slugs are skipped), in no set order
+export async function getProductsBySlugs(slugs: string[]) {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("products");
+
+  if (slugs.length === 0) return [];
+  const rows = await db.query.products.findMany({
+    where: inArray(products.slug, slugs),
+    with: { category: true },
+  });
+  return rows.map(toProduct);
 }
 
 // Same category first, then the rest of the catalogue

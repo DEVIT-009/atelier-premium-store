@@ -41,6 +41,7 @@ export const products = pgTable(
     categoryId: uuid("category_id")
       .notNull()
       .references(() => categories.id, { onDelete: "restrict" }),
+    department: text("department").default("unisex").notNull(), // women | men | unisex (listed under both)
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
       .notNull(),
@@ -54,6 +55,10 @@ export const products = pgTable(
     index("products_created_at_idx").on(table.createdAt),
     check("products_price_cents_check", sql`${table.priceCents} >= 0`),
     check("products_stock_check", sql`${table.stock} >= 0`),
+    check(
+      "products_department_check",
+      sql`${table.department} IN ('women', 'men', 'unisex')`,
+    ),
   ],
 );
 

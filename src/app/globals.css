@@ -316,6 +316,43 @@
     }
   }
 
+  /* --- Form fields ----------------------------------------------------------
+     .input for <input> and <select>. Same height as .btn, hairline border
+     that darkens on hover and turns solid on focus. */
+  .input {
+    display: block;
+    width: 100%;
+    height: 3rem;
+    padding-inline: 1rem;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-xs);
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-size: 1rem; /* 16px stops iOS zooming on focus */
+    line-height: var(--text-body--line-height);
+    transition: border-color 400ms var(--ease-luxe);
+
+    &::placeholder {
+      color: var(--color-muted);
+    }
+
+    &:hover {
+      border-color: var(--color-foreground);
+    }
+
+    &:focus-visible {
+      border-color: var(--color-foreground);
+      outline-offset: 0;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      color: var(--color-muted);
+      background-color: var(--color-surface);
+      border-color: var(--color-line);
+    }
+  }
+
   /* --- Links ----------------------------------------------------------------
      .link: underlined text CTA; the underline retracts on hover.
      .link-quiet: no underline until hover (nav, footer, inline lists). */

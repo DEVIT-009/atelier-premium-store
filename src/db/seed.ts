@@ -35,6 +35,7 @@ async function main() {
       imageAlt: product.image.alt,
       badge: product.badge ?? null,
       categoryId,
+      department: product.department,
       createdAt: new Date(now - index * 1000),
     };
   });
@@ -55,6 +56,7 @@ async function main() {
         imageAlt: sql`excluded.image_alt`,
         badge: sql`excluded.badge`,
         categoryId: sql`excluded.category_id`,
+        department: sql`excluded.department`,
         createdAt: sql`excluded.created_at`,
         updatedAt: sql`now()`,
       },

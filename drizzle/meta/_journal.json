@@ -8,6 +8,55 @@
       "when": 1793547988012,
       "tag": "0000_tan_lady_bullseye",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793713652901,
+      "tag": "0001_curly_mister_fear",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793891178549,
+      "tag": "0002_steady_old_lace",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1793894032748,
+      "tag": "0003_order_receiver_fields",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793894037042,
+      "tag": "0004_backfill_order_receiver",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1793894050271,
+      "tag": "0005_order_delivery_method",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793944632885,
+      "tag": "0006_product_department",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1793944633430,
+      "tag": "0007_backfill_product_department",
+      "breakpoints": true
     }
   ]
 }

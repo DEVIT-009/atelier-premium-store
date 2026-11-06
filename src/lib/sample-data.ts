@@ -105,6 +105,14 @@ export const eveningEdit = {
   },
 };
 
+// Sign in / sign up side image (same photo as the "Built to Last" story)
+export const authFeature = {
+  image: {
+    src: unsplash("1490481651871-ab68de25d43d", 1600),
+    alt: "Neutral toned blouses and knits on wooden hangers along a rail",
+  },
+};
+
 export const tailoring = {
   eyebrow: "Men",
   title: "The Art of Tailoring",

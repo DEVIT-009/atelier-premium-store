@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { addToBag } from "@/app/bag/actions";
+import { PendingButton } from "@/components/bag/pending-button";
 import { SectionHeading } from "@/components/home/section-heading";
 import { PlusIcon } from "@/components/icons";
 import { ProductCard } from "@/components/product/product-card";
@@ -40,9 +42,19 @@ export async function generateMetadata({
   };
 }
 
-export default async function ProductPage({
+// params is URL data: read it inside Suspense so the shared App Shell stays
+// URL-independent and navigations can be instant
+export default function ProductPage({ params }: PageProps<"/products/[slug]">) {
+  return (
+    <Suspense fallback={<ProductSkeleton />}>
+      <ProductDetails params={params} />
+    </Suspense>
+  );
+}
+
+async function ProductDetails({
   params,
-}: PageProps<"/products/[slug]">) {
+}: Pick<PageProps<"/products/[slug]">, "params">) {
   const { slug } = await params;
   const product = await getProductBySlug(slug);
   if (!product) notFound();
@@ -130,10 +142,11 @@ export default async function ProductPage({
                   Sold out
                 </button>
               ) : (
-                // Not wired up yet: connect to the bag once the cart exists
-                <button type="button" className="btn btn-primary btn-lg btn-block">
-                  Add to bag
-                </button>
+                <form action={addToBag.bind(null, product.slug)}>
+                  <PendingButton className="btn btn-primary btn-lg btn-block">
+                    Add to bag
+                  </PendingButton>
+                </form>
               )}
               <p className="text-center text-caption text-muted uppercase">
                 Complimentary express shipping and returns
@@ -183,6 +196,29 @@ export default async function ProductPage({
         </section>
       )}
     </>
+  );
+}
+
+// Mirrors the article layout so the page doesn't shift when content streams in
+function ProductSkeleton() {
+  return (
+    <div
+      aria-busy="true"
+      aria-label="Loading product"
+      className="lg:page lg:grid lg:grid-cols-12 lg:gap-x-6 lg:pt-6"
+    >
+      <div className="lg:col-span-7">
+        <div className="media-frame aspect-portrait" />
+      </div>
+      <div className="lg:col-span-5">
+        <div className="flex flex-col px-(--gutter) pt-8 lg:px-0 lg:pt-0 lg:pl-8 xl:pl-16">
+          <div className="h-3.5 w-40 bg-surface" />
+          <div className="mt-8 h-8 w-3/4 bg-surface lg:mt-12 lg:h-10" />
+          <div className="mt-3 h-7 w-24 bg-surface" />
+          <div className="mt-8 h-14 w-full bg-surface" />
+        </div>
+      </div>
+    </div>
   );
 }
 
