@@ -1,9 +1,23 @@
 import Image from "next/image";
 import Link from "next/link";
 import { SectionHeading } from "@/components/home/section-heading";
+import { getCategoryHref, getStoreCategories } from "@/lib/products";
 import { collections } from "@/lib/sample-data";
 
-export function CollectionGrid() {
+// Women and Men are fixed; the categories staff put on the homepage follow,
+// each pictured by its newest product on sale
+export async function CollectionGrid() {
+  const { home } = await getStoreCategories();
+  const tiles = [
+    ...collections,
+    ...home.map((category) => ({
+      slug: category.slug,
+      title: category.name,
+      href: getCategoryHref(category),
+      image: category.image,
+    })),
+  ];
+
   return (
     <section aria-labelledby="collections-title" className="page section">
       <SectionHeading
@@ -13,7 +27,7 @@ export function CollectionGrid() {
       />
 
       <ul className="grid grid-cols-2 gap-x-1 gap-y-8 lg:grid-cols-4">
-        {collections.map((collection) => (
+        {tiles.map((collection) => (
           <li key={collection.slug} className="group relative">
             <div className="media-frame aspect-tall">
               <Image

@@ -16,23 +16,26 @@ export type Collection = {
 };
 
 export type Story = {
+  slug: string;
   eyebrow: string;
   title: string;
   href: string;
   image: ImageAsset;
+  description: string;
+  body: string[];
+  cta: { label: string; href: string };
 };
 
 function unsplash(id: string, width = 2000) {
   return `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${width}&q=80`;
 }
 
+// The menu's fixed links; the categories staff choose follow them
+// (getStoreCategories in src/lib/products.ts)
 export const navigation = [
   { label: "New In", href: "/new-in" },
   { label: "Women", href: "/women" },
   { label: "Men", href: "/men" },
-  { label: "Bags", href: "/bags" },
-  { label: "Shoes", href: "/shoes" },
-  { label: "Jewelry", href: "/jewelry" },
 ] as const;
 
 export const hero = {
@@ -54,6 +57,7 @@ export const hero = {
   ],
 };
 
+// The homepage's fixed department tiles; the categories staff choose follow them
 export const collections: Collection[] = [
   {
     slug: "women",
@@ -71,24 +75,6 @@ export const collections: Collection[] = [
     image: {
       src: unsplash("1617137968427-85924c800a22", 1200),
       alt: "Man in a navy suit with a white shirt and brown leather shoes",
-    },
-  },
-  {
-    slug: "shoes",
-    title: "Shoes",
-    href: "/shoes",
-    image: {
-      src: unsplash("1543163521-1bf539c55dd2", 1200),
-      alt: "Pair of floral print stiletto pumps on a pale blue set",
-    },
-  },
-  {
-    slug: "jewelry",
-    title: "Jewelry",
-    href: "/jewelry",
-    image: {
-      src: unsplash("1535632066927-ab7c9ab60908", 1200),
-      alt: "Sapphire and crystal drop earrings resting on a green leaf",
     },
   },
 ];
@@ -125,6 +111,7 @@ export const tailoring = {
 
 export const stories: Story[] = [
   {
+    slug: "linen-and-light",
     eyebrow: "Journal",
     title: "Linen, Light and the Long Summer",
     href: "/journal/linen-and-light",
@@ -132,8 +119,18 @@ export const stories: Story[] = [
       src: unsplash("1496747611176-843222e1e57c", 1600),
       alt: "Floral print wrap dress moving in the wind by the sea",
     },
+    description:
+      "How to dress for the slow, bright days, when the best clothes are the ones you forget you are wearing.",
+    body: [
+      "There is a point in every summer when the heat stops being an event and becomes the weather you live in. Mornings start earlier, evenings run later, and the wardrobe gets smaller without anyone deciding that it should.",
+      "This is the season for cloth that moves. Linen creases and softens, and it looks better for both. A dress cut with room in it catches whatever breeze there is, and a loose shirt carries you from the first coffee to the last walk home.",
+      "Keep the palette close to what the light is already doing: chalk, sand, faded blue, and one print you love enough to wear twice in a week. Then let the details stay simple, with a flat shoe, a small earring and a bag that holds only what the day needs.",
+      "The long summer asks for very little. Choose a few pieces that feel easy, wear them often, and leave the rest of the rail for the cooler months.",
+    ],
+    cta: { label: "Shop women", href: "/women" },
   },
   {
+    slug: "built-to-last",
     eyebrow: "Inside the Atelier",
     title: "A Wardrobe Built to Last",
     href: "/journal/built-to-last",
@@ -141,6 +138,15 @@ export const stories: Story[] = [
       src: unsplash("1490481651871-ab68de25d43d", 1600),
       alt: "Neutral toned blouses and knits on wooden hangers along a rail",
     },
+    description:
+      "Fewer pieces, chosen slowly and looked after well. A few thoughts on keeping clothes for years rather than seasons.",
+    body: [
+      "A lasting wardrobe rarely begins with a shopping list. It begins with a look at the rail: the things you reach for without thinking, and the things that have hung untouched since the day they arrived.",
+      "The pieces worth keeping tend to share a few qualities. The shape is clear enough to outlive a trend, the cloth wears in rather than out, and the color sits easily beside everything else you own. A good knit or a well-cut blouse should work on a Monday and still feel right on a Saturday.",
+      "Care is the other half of it. Rest a garment between wears, fold knits instead of hanging them, and mend a loose button before it goes missing. Small habits like these are what turn a purchase into something you keep.",
+      "When you do add something new, ask whether you can see yourself wearing it in five years. If the answer comes easily, it probably belongs.",
+    ],
+    cta: { label: "Shop new in", href: "/new-in" },
   },
 ];
 

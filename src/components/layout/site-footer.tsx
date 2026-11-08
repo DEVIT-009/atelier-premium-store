@@ -64,7 +64,7 @@ export function SiteFooter() {
 
         <div className="mt-8 flex flex-col gap-2 border-t pt-6 text-caption uppercase sm:flex-row sm:justify-between">
           <p>© 2026 Atelier Store</p>
-          <p className="text-muted">Images courtesy of Unsplash</p>
+          <p className="text-muted">Some images courtesy of Unsplash</p>
         </div>
       </div>
     </footer>

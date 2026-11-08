@@ -57,6 +57,62 @@
       "when": 1793944633430,
       "tag": "0007_backfill_product_department",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1794035242480,
+      "tag": "0008_free_jocasta",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1794040330438,
+      "tag": "0009_silent_firestar",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1794044133651,
+      "tag": "0010_fuzzy_toro",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1794048396208,
+      "tag": "0011_clever_leech",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1794106206398,
+      "tag": "0012_category_navigation",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1794106206985,
+      "tag": "0013_backfill_category_navigation",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1794114390177,
+      "tag": "0014_user_management",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1794116103741,
+      "tag": "0015_admin_access",
+      "breakpoints": true
     }
   ]
 }

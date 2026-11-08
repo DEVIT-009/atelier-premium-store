@@ -35,7 +35,10 @@ export async function setBagQuantity(slug: string, quantity: number) {
 
   const product = await getProductBySlug(slug);
   if (!product) return;
-  entry.quantity = Math.max(1, Math.min(quantity, product.stock, MAX_QUANTITY));
+  // Never pushes above stock, but lowering always works: a quantity held by the
+  // customer's own reservation can exceed the stock left for everyone else
+  const limit = Math.max(entry.quantity, product.stock);
+  entry.quantity = Math.max(1, Math.min(quantity, limit, MAX_QUANTITY));
   await writeBagEntries(entries);
 }
 

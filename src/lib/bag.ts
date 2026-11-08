@@ -1,7 +1,9 @@
 // Shopping bag. The cookie only holds slugs and quantities; prices and stock
 // always come from the catalogue, so a tampered cookie can't change a total.
 import { cookies } from "next/headers";
+import { getReservedQuantities } from "@/lib/orders";
 import { getProductsBySlugs, type Product } from "@/lib/products";
+import { getSession } from "@/lib/session";
 
 const BAG_COOKIE = "bag";
 const MAX_LINES = 50;
@@ -12,6 +14,7 @@ export type BagEntry = { slug: string; quantity: number };
 export type BagLine = {
   product: Product;
   quantity: number; // requested
+  stock: number; // what this customer can buy: product stock plus their own reservation
   available: number; // what can actually be bought: min(quantity, stock)
 };
 
@@ -67,10 +70,21 @@ export async function getBag(): Promise<Bag> {
   );
   const bySlug = new Map(products.map((product) => [product.slug, product]));
 
-  const lines = entries.flatMap(({ slug, quantity }) => {
+  const found = entries.flatMap(({ slug, quantity }) => {
     const product = bySlug.get(slug);
-    if (!product) return [];
-    return [{ product, quantity, available: Math.min(quantity, product.stock) }];
+    return product ? [{ product, quantity }] : [];
+  });
+
+  // Product stock excludes the customer's own unpaid QR, which they can still
+  // buy (createOrder counts it too). Looked up only when a line falls short, so
+  // the bag count in the header adds no queries to a normal page.
+  const isShort = found.some(({ product, quantity }) => quantity > product.stock);
+  const session = isShort ? await getSession() : null;
+  const reserved = session ? await getReservedQuantities(session.user.id) : new Map<string, number>();
+
+  const lines = found.map(({ product, quantity }) => {
+    const stock = product.stock + (reserved.get(product.id) ?? 0);
+    return { product, quantity, stock, available: Math.min(quantity, stock) };
   });
 
   return {

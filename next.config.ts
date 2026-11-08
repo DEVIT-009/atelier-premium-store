@@ -42,6 +42,12 @@ const nextConfig: NextConfig = {
     return [{ source: "/(.*)", headers: securityHeaders }];
   },
   cacheComponents: true,
+  // Enables forbidden() and unauthorized(), which render the 403 and 401 pages
+  experimental: {
+    authInterrupts: true,
+    // Room for a 5 MB image upload (MAX_IMAGE_MB) plus the rest of the product form
+    serverActions: { bodySizeLimit: "6mb" },
+  },
   // The KHQR icon is read from disk at runtime (src/lib/khqr/image.ts); make
   // sure serverless bundles include it, since public/ is served separately
   outputFileTracingIncludes: {
@@ -49,6 +55,8 @@ const nextConfig: NextConfig = {
   },
   partialPrefetching: true,
   images: {
+    // Uploads carry a ?v= that changes when the image is replaced
+    localPatterns: [{ pathname: "/uploads/products/**" }],
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com", pathname: "/**" },
     ],

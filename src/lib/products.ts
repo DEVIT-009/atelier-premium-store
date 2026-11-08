@@ -1,6 +1,7 @@
-// Catalogue access. Reads products from Postgres; components only ever see the
-// Product shape below, never raw DB rows.
-import { desc, eq, inArray, ne, sql } from "drizzle-orm";
+// Catalogue access for the storefront. Reads products from Postgres; components
+// only ever see the Product shape below, never raw DB rows. Every read here is
+// limited to active products: staff reads are in src/lib/admin-products.ts.
+import { and, asc, desc, eq, inArray, ne, or, sql } from "drizzle-orm";
 import { cacheLife, cacheTag } from "next/cache";
 import { db } from "@/db";
 import { categories, products } from "@/db/schema";
@@ -68,6 +69,8 @@ function toProduct(row: ProductRow): Product {
   };
 }
 
+const isActive = eq(products.status, "active");
+
 // Revalidate after catalogue or stock changes with revalidateTag("products")
 export async function getProducts({ limit }: { limit?: number } = {}) {
   "use cache";
@@ -75,6 +78,7 @@ export async function getProducts({ limit }: { limit?: number } = {}) {
   cacheTag("products");
 
   const rows = await db.query.products.findMany({
+    where: isActive,
     with: { category: true },
     orderBy: [desc(products.createdAt)],
     limit,
@@ -87,7 +91,7 @@ export async function getProductSlugs() {
   cacheLife("hours");
   cacheTag("products");
 
-  const rows = await db.select({ slug: products.slug }).from(products);
+  const rows = await db.select({ slug: products.slug }).from(products).where(isActive);
   return rows.map((row) => row.slug);
 }
 
@@ -100,6 +104,39 @@ export async function getCategorySlugs() {
   return rows.map((row) => row.slug);
 }
 
+export type StoreCategory = Category & { image: ImageAsset };
+
+// The categories staff chose for the store's menu and homepage, in their order,
+// each pictured by its newest product on sale. A category with nothing on sale
+// is left out of both, so no link leads to an empty page.
+export async function getStoreCategories() {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("products");
+
+  const rows = await db.query.categories.findMany({
+    where: or(eq(categories.showInMenu, true), eq(categories.showOnHome, true)),
+    orderBy: [asc(categories.position), asc(categories.name)],
+    with: {
+      products: {
+        where: isActive,
+        orderBy: [desc(products.createdAt), desc(products.id)],
+        limit: 1,
+        columns: { imageUrl: true, imageAlt: true },
+      },
+    },
+  });
+
+  const listed = rows.flatMap(({ products: [newest], ...category }) =>
+    newest ? [{ ...category, image: { src: newest.imageUrl, alt: newest.imageAlt } }] : [],
+  );
+  const toStoreCategory = ({ slug, name, image }: (typeof listed)[number]): StoreCategory => ({ slug, name, image });
+  return {
+    menu: listed.filter((category) => category.showInMenu).map(toStoreCategory),
+    home: listed.filter((category) => category.showOnHome).map(toStoreCategory),
+  };
+}
+
 // The department's products plus unisex pieces, newest first
 export async function getDepartmentProducts(department: "women" | "men") {
   "use cache";
@@ -107,7 +144,7 @@ export async function getDepartmentProducts(department: "women" | "men") {
   cacheTag("products");
 
   const rows = await db.query.products.findMany({
-    where: inArray(products.department, [department, "unisex"]),
+    where: and(isActive, inArray(products.department, [department, "unisex"])),
     with: { category: true },
     orderBy: [desc(products.createdAt)],
   });
@@ -122,7 +159,7 @@ export async function getCategoryWithProducts(slug: string) {
 
   const category = await db.query.categories.findFirst({
     where: eq(categories.slug, slug),
-    with: { products: { orderBy: [desc(products.createdAt)] } },
+    with: { products: { where: isActive, orderBy: [desc(products.createdAt)] } },
   });
   if (!category) return undefined;
 
@@ -139,7 +176,7 @@ export async function getProductBySlug(slug: string) {
   cacheTag("products");
 
   const row = await db.query.products.findFirst({
-    where: eq(products.slug, slug),
+    where: and(isActive, eq(products.slug, slug)),
     with: { category: true },
   });
   return row ? toProduct(row) : undefined;
@@ -153,7 +190,7 @@ export async function getProductsBySlugs(slugs: string[]) {
 
   if (slugs.length === 0) return [];
   const rows = await db.query.products.findMany({
-    where: inArray(products.slug, slugs),
+    where: and(isActive, inArray(products.slug, slugs)),
     with: { category: true },
   });
   return rows.map(toProduct);
@@ -169,7 +206,7 @@ export async function getRelatedProducts(product: Product, limit = 4) {
     .select()
     .from(products)
     .innerJoin(categories, eq(products.categoryId, categories.id))
-    .where(ne(products.id, product.id))
+    .where(and(isActive, ne(products.id, product.id)))
     .orderBy(
       desc(sql`${categories.slug} = ${product.category.slug}`),
       desc(products.createdAt),

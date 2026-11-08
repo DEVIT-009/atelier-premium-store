@@ -1,5 +1,6 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { APIError } from "better-auth/api";
 import { nextCookies } from "better-auth/next-js";
 import { db } from "@/db";
 
@@ -33,6 +34,46 @@ export const auth = betterAuth({
     enabled: true,
     minPasswordLength: 8,
     maxPasswordLength: 128,
+  },
+  user: {
+    additionalFields: {
+      // input: false is what stops users setting their own role through sign-up
+      // or update-user. Only a manual database update makes someone an admin.
+      role: {
+        type: "string",
+        required: true,
+        defaultValue: "user",
+        input: false,
+      },
+      // Set and cleared only by staff (src/lib/admin-users.ts)
+      blockedAt: {
+        type: "date",
+        required: false,
+        input: false,
+      },
+    },
+  },
+  databaseHooks: {
+    session: {
+      create: {
+        // Blocking ends every session; this refuses new ones, so a blocked user
+        // can't sign in. It runs after the password check, so it reveals
+        // nothing to someone without the password.
+        async before(session, ctx) {
+          if (!ctx) return;
+          // The internal adapter's type leaves out additional fields
+          const found = (await ctx.context.internalAdapter.findUserById(session.userId)) as {
+            blockedAt?: Date | null;
+          } | null;
+          if (found?.blockedAt) {
+            throw APIError.from("FORBIDDEN", {
+              message: "This account is blocked.",
+              code: "ACCOUNT_BLOCKED",
+            });
+          }
+        },
+      },
+    },
   },
   // In-memory counters are per serverless instance; keep them in Postgres.
   // Built-in rules already limit sign-in/sign-up to 3 requests per 10s.

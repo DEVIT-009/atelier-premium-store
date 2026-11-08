@@ -1,17 +1,17 @@
 import Image from "next/image";
 import Link from "next/link";
-import { removeFromBag, setBagQuantity } from "@/app/bag/actions";
-import { PendingButton } from "@/components/bag/pending-button";
+import { removeFromBag, setBagQuantity } from "@/app/(store)/bag/actions";
+import { PendingButton } from "@/components/form/pending-button";
 import { formatPrice } from "@/lib/format";
 import { MAX_QUANTITY, type BagLine as BagLineType } from "@/lib/bag";
 import { getStockLabel, getStockStatus } from "@/lib/products";
 
 export function BagLine({ line }: { line: BagLineType }) {
-  const { product, quantity, available } = line;
-  const status = getStockStatus(product.stock);
+  const { product, quantity, stock, available } = line;
+  const status = getStockStatus(stock);
   const soldOut = status === "sold-out";
   const href = `/products/${product.slug}`;
-  const max = Math.min(product.stock, MAX_QUANTITY);
+  const max = Math.min(stock, MAX_QUANTITY);
 
   return (
     <li className="flex gap-4 border-b py-6 lg:gap-6 lg:py-8">
@@ -54,8 +54,8 @@ export function BagLine({ line }: { line: BagLineType }) {
             {soldOut
               ? "Sold out — remove to continue"
               : available < quantity
-                ? `Only ${product.stock} available`
-                : getStockLabel(product.stock)}
+                ? `Only ${stock} available`
+                : getStockLabel(stock)}
           </p>
         )}
 

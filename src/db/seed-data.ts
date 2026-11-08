@@ -19,13 +19,14 @@ function unsplash(id: string, width = 2000) {
   return `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${width}&q=80`;
 }
 
+// Same menu and homepage order as drizzle/0013_backfill_category_navigation.sql
 export const seedCategories = [
-  { slug: "bags", name: "Bags" },
-  { slug: "ready-to-wear", name: "Ready-to-Wear" },
-  { slug: "jewelry", name: "Jewelry" },
-  { slug: "accessories", name: "Accessories" },
-  { slug: "shoes", name: "Shoes" },
-  { slug: "watches", name: "Watches" },
+  { slug: "bags", name: "Bags", position: 1, showInMenu: true },
+  { slug: "shoes", name: "Shoes", position: 2, showInMenu: true, showOnHome: true },
+  { slug: "jewelry", name: "Jewelry", position: 3, showInMenu: true, showOnHome: true },
+  { slug: "accessories", name: "Accessories", position: 4 },
+  { slug: "ready-to-wear", name: "Ready-to-Wear", position: 5 },
+  { slug: "watches", name: "Watches", position: 6 },
 ];
 
 // Product images are requested at 2000px so they stay sharp at detail-page size

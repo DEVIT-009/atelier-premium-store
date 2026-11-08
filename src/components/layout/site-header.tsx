@@ -3,9 +3,17 @@ import Link from "next/link";
 import { BagIcon, SearchIcon, UserIcon } from "@/components/icons";
 import { MobileMenu } from "@/components/layout/mobile-menu";
 import { getBag } from "@/lib/bag";
+import { getCategoryHref, getStoreCategories } from "@/lib/products";
 import { navigation } from "@/lib/sample-data";
 
-export function SiteHeader() {
+export async function SiteHeader() {
+  // Cached, so the menu stays part of the static shell
+  const { menu } = await getStoreCategories();
+  const items = [
+    ...navigation,
+    ...menu.map((category) => ({ label: category.name, href: getCategoryHref(category) })),
+  ];
+
   return (
     <>
       <div className="theme-inverse">
@@ -17,10 +25,10 @@ export function SiteHeader() {
       <header className="sticky top-0 z-40 border-b bg-background">
         <div className="page grid h-(--header-height) grid-cols-[1fr_auto_1fr] items-center">
           <div className="flex items-center">
-            <MobileMenu items={navigation} />
+            <MobileMenu items={items} />
             <nav aria-label="Main" className="hidden lg:block">
               <ul className="flex items-center gap-6">
-                {navigation.map((item) => (
+                {items.map((item) => (
                   <li key={item.href}>
                     <Link href={item.href} className="nav-link link-quiet">
                       {item.label}

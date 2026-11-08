@@ -8,7 +8,12 @@ const messages: Record<string, string> = {
   INVALID_EMAIL: "Enter a valid email address.",
   PASSWORD_TOO_SHORT: "Your password must be at least 8 characters.",
   PASSWORD_TOO_LONG: "Your password must be 128 characters or fewer.",
+  ACCOUNT_BLOCKED: "This account has been blocked. Contact client services for help.",
 };
+
+// The request never got an answer (offline, server down, blocked origin)
+export const AUTH_NETWORK_ERROR =
+  "We couldn't reach the server. Check your connection and try again.";
 
 export function getAuthErrorMessage(error: AuthError) {
   if (error?.status === 429) {

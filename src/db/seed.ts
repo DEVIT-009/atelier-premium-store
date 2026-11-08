@@ -1,6 +1,7 @@
-// Loads the initial catalogue. Safe to re-run: rows are upserted by slug.
+// Loads the initial catalogue. Safe to re-run: only slugs that don't exist yet
+// are inserted, so live stock, prices and edits are never overwritten.
 // Usage: npm run db:seed
-import { sql } from "drizzle-orm";
+import { inArray } from "drizzle-orm";
 import { db } from "./index";
 import { categories, products } from "./schema";
 import { seedCategories, seedProducts } from "./seed-data";
@@ -9,13 +10,15 @@ async function main() {
   const insertedCategories = await db
     .insert(categories)
     .values(seedCategories)
-    .onConflictDoUpdate({
-      target: categories.slug,
-      set: { name: sql`excluded.name` },
-    })
-    .returning({ id: categories.id, slug: categories.slug });
+    .onConflictDoNothing({ target: categories.slug })
+    .returning({ id: categories.id });
 
-  const categoryIds = new Map(insertedCategories.map((c) => [c.slug, c.id]));
+  // Read back rather than using returning: it skips rows that already existed
+  const allCategories = await db
+    .select({ id: categories.id, slug: categories.slug })
+    .from(categories)
+    .where(inArray(categories.slug, seedCategories.map((c) => c.slug)));
+  const categoryIds = new Map(allCategories.map((c) => [c.slug, c.id]));
 
   // Stagger created_at so "New In" (newest first) keeps the listed order
   const now = Date.now();
@@ -41,29 +44,14 @@ async function main() {
   });
 
   // One multi-row statement, so the products load atomically
-  await db
+  const insertedProducts = await db
     .insert(products)
     .values(rows)
-    .onConflictDoUpdate({
-      target: products.slug,
-      set: {
-        name: sql`excluded.name`,
-        description: sql`excluded.description`,
-        details: sql`excluded.details`,
-        priceCents: sql`excluded.price_cents`,
-        stock: sql`excluded.stock`,
-        imageUrl: sql`excluded.image_url`,
-        imageAlt: sql`excluded.image_alt`,
-        badge: sql`excluded.badge`,
-        categoryId: sql`excluded.category_id`,
-        department: sql`excluded.department`,
-        createdAt: sql`excluded.created_at`,
-        updatedAt: sql`now()`,
-      },
-    });
+    .onConflictDoNothing({ target: products.slug })
+    .returning({ id: products.id });
 
   console.log(
-    `Seeded ${insertedCategories.length} categories and ${rows.length} products.`,
+    `Added ${insertedCategories.length} new categories and ${insertedProducts.length} new products.`,
   );
 }
 

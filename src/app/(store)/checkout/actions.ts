@@ -9,6 +9,7 @@ import {
   checkOrderPayment,
   CheckoutError,
   createOrder,
+  EarlierOrderPaidError,
   type CheckoutDetails,
 } from "@/lib/orders";
 import { isProvince } from "@/lib/provinces";
@@ -93,6 +94,11 @@ export async function placeOrder(
     };
   } catch (error) {
     if (error instanceof CheckoutError) return { status: "error", message: error.message };
+    if (error instanceof EarlierOrderPaidError) {
+      // A different bag is a new purchase, so it stays for later
+      if (error.sameBag) await writeBagEntries([]);
+      redirect(`/checkout/thank-you?order=${error.orderId}`);
+    }
     console.error("placeOrder failed", error);
     return { status: "error", message: "We couldn't start your payment. Please try again." };
   }

@@ -16,7 +16,7 @@ import {
   placeOrder,
   type CheckPaymentResult,
   type PlaceOrderState,
-} from "@/app/checkout/actions";
+} from "@/app/(store)/checkout/actions";
 import { CloseIcon } from "@/components/icons";
 import { formatPriceExact } from "@/lib/format";
 

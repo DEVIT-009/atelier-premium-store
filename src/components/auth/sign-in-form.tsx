@@ -3,8 +3,8 @@
 import { useActionState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { getAuthErrorMessage } from "@/components/auth/auth-error";
-import { PendingButton } from "@/components/bag/pending-button";
+import { AUTH_NETWORK_ERROR, getAuthErrorMessage } from "@/components/auth/auth-error";
+import { PendingButton } from "@/components/form/pending-button";
 import { Field } from "@/components/form/field";
 import { signIn } from "@/lib/auth-client";
 import { safeRedirect } from "@/lib/redirect";
@@ -13,7 +13,7 @@ type State = { error: string | null; email: string };
 
 export function SignInForm() {
   const router = useRouter();
-  const redirectParam = useSearchParams().get("redirectTo");
+  const redirectParam = useSearchParams()?.get("redirectTo") ?? null;
   const redirectTo = safeRedirect(redirectParam);
 
   const [state, formAction] = useActionState<State, FormData>(
@@ -21,8 +21,14 @@ export function SignInForm() {
       const email = String(formData.get("email") ?? "").trim();
       const password = String(formData.get("password") ?? "");
 
-      const { error } = await signIn.email({ email, password });
-      if (error) return { error: getAuthErrorMessage(error), email };
+      // Better Auth returns HTTP errors but throws when the fetch itself fails
+      let result;
+      try {
+        result = await signIn.email({ email, password });
+      } catch {
+        return { error: AUTH_NETWORK_ERROR, email };
+      }
+      if (result.error) return { error: getAuthErrorMessage(result.error), email };
 
       router.replace(redirectTo);
       router.refresh();

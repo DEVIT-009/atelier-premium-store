@@ -64,5 +64,12 @@ export async function checkTransactionByMd5(md5: string): Promise<BakongCheck> {
   if (body.responseCode === 0 && body.data && typeof body.data.hash === "string") {
     return { paid: true, transaction: body.data };
   }
-  return { paid: false }; // errorCode 1: not found (unpaid), 3: failed
+  // errorCode 1: not found (unpaid), 3: failed
+  if (body.responseCode === 1 && (body.errorCode === 1 || body.errorCode === 3)) {
+    return { paid: false };
+  }
+  // Anything else says nothing about this payment, so it can't count as unpaid
+  throw new BakongUnavailableError(
+    `Bakong returned responseCode ${body.responseCode}, errorCode ${body.errorCode}`,
+  );
 }

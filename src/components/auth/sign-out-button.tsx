@@ -1,5 +1,5 @@
-import { signOutAction } from "@/app/account/actions";
-import { PendingButton } from "@/components/bag/pending-button";
+import { signOutAction } from "@/app/(store)/account/actions";
+import { PendingButton } from "@/components/form/pending-button";
 
 // Plain form + Server Action: logs out even without JavaScript
 export function SignOutButton({ className = "" }: { className?: string }) {
