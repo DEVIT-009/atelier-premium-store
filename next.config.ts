@@ -2,6 +2,9 @@ import type { NextConfig } from "next";
 
 const isDev = process.env.NODE_ENV === "development";
 
+const cloudinaryCloudName = process.env.CLOUDINARY_CLOUD_NAME;
+if (!cloudinaryCloudName) throw new Error("CLOUDINARY_CLOUD_NAME is required");
+
 // Static CSP (no nonces): nonces would force every page to render dynamically.
 // Images go through /_next/image and next/font self-hosts, so 'self' covers both.
 const csp = [
@@ -55,10 +58,10 @@ const nextConfig: NextConfig = {
   },
   partialPrefetching: true,
   images: {
-    // Uploads carry a ?v= that changes when the image is replaced
-    localPatterns: [{ pathname: "/uploads/products/**" }],
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com", pathname: "/**" },
+      // Only this account's images
+      { protocol: "https", hostname: "res.cloudinary.com", pathname: `/${cloudinaryCloudName}/image/upload/**` },
     ],
   },
   turbopack: {

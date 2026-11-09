@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { Suspense, type ReactNode } from "react";
+import { Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { addToBag } from "@/app/(store)/bag/actions";
 import { PendingButton } from "@/components/form/pending-button";
 import { SectionHeading } from "@/components/home/section-heading";
-import { PlusIcon } from "@/components/icons";
+import { Disclosure } from "@/components/layout/disclosure";
 import { ProductCard } from "@/components/product/product-card";
 import { StockStatus } from "@/components/product/stock-status";
 import { formatPrice } from "@/lib/format";
@@ -219,26 +219,5 @@ function ProductSkeleton() {
         </div>
       </div>
     </div>
-  );
-}
-
-// Native <details>: keyboard accessible and works without JavaScript
-function Disclosure({
-  title,
-  defaultOpen = false,
-  children,
-}: {
-  title: string;
-  defaultOpen?: boolean;
-  children: ReactNode;
-}) {
-  return (
-    <details className="group border-b" open={defaultOpen}>
-      <summary className="flex cursor-pointer list-none items-center justify-between py-5 [&::-webkit-details-marker]:hidden">
-        <span className="eyebrow">{title}</span>
-        <PlusIcon className="transition-transform duration-300 group-open:rotate-45" />
-      </summary>
-      <div className="pb-6 text-body-s text-muted">{children}</div>
-    </details>
   );
 }

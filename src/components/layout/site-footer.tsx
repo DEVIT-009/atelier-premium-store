@@ -57,7 +57,7 @@ export function SiteFooter() {
         <p
           aria-hidden="true"
           // Sized so the word spans the content width; capped past the 1600px container
-          className="mt-16 font-serif text-[min(28vw,28rem)] leading-[0.8] tracking-[0.04em] uppercase lg:mt-24"
+          className="mt-16 font-serif text-[min(28vw,28rem)] leading-[0.8] tracking-[0.04em] uppercase lg:mt-32"
         >
           Atelier
         </p>

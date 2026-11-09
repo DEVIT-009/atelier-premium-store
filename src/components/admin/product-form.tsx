@@ -35,6 +35,7 @@ export function ProductForm({
   imageHosts,
   maxImageMb,
   product,
+  hasUploadedImage = false,
 }: {
   action: (previous: ProductFormState, formData: FormData) => Promise<ProductFormState>;
   categories: readonly { value: string; label: string }[];
@@ -42,11 +43,10 @@ export function ProductForm({
   imageHosts: readonly string[];
   maxImageMb: number;
   product?: Values;
+  hasUploadedImage?: boolean;
 }) {
   const [state, formAction, pending] = useActionState(action, { status: "idle" });
-  // Links are full URLs and uploads are paths on this site
-  const hasLocalImage = product?.imageUrl.startsWith("/") ?? false;
-  const [source, setSource] = useState<"upload" | "url">(product && !hasLocalImage ? "url" : "upload");
+  const [source, setSource] = useState<"upload" | "url">(product && !hasUploadedImage ? "url" : "upload");
   const [fileError, setFileError] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
 
@@ -199,7 +199,7 @@ export function ProductForm({
             required
             type="url"
             hint={`A JPG, PNG or WebP image from ${imageHosts.join(" or ")}. We check the link when you save.`}
-            defaultValue={hasLocalImage ? undefined : product?.imageUrl}
+            defaultValue={hasUploadedImage ? undefined : product?.imageUrl}
             error={errorFor("imageUrl")}
           />
         )}

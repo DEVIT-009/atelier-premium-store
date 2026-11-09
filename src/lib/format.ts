@@ -47,3 +47,13 @@ const dateTime = new Intl.DateTimeFormat("en-US", {
 export function formatDateTime(date: Date) {
   return dateTime.format(date);
 }
+
+const dateOnly = new Intl.DateTimeFormat("en-US", {
+  dateStyle: "medium",
+  timeZone: "Asia/Phnom_Penh",
+});
+
+// Store time, like formatDateTime
+export function formatDate(date: Date) {
+  return dateOnly.format(date);
+}

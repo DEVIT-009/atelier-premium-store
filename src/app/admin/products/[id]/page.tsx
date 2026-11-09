@@ -26,7 +26,7 @@ import {
   type ProductStatus,
 } from "@/lib/admin-products";
 import { formatDateTime } from "@/lib/format";
-import { MAX_IMAGE_MB } from "@/lib/product-images";
+import { isUploadedImage, MAX_IMAGE_MB } from "@/lib/product-images";
 
 export const metadata: Metadata = {
   title: "Product",
@@ -110,6 +110,7 @@ async function ProductDetail({ params, searchParams }: PageProps) {
             imageHosts={IMAGE_HOSTS}
             maxImageMb={MAX_IMAGE_MB}
             product={product}
+            hasUploadedImage={isUploadedImage(product.imageUrl)}
           />
         </div>
 

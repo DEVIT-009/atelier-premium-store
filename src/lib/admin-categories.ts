@@ -11,7 +11,7 @@ import { isStillReferenced } from "@/lib/admin-products";
 export const RESERVED_CATEGORY_SLUGS = new Set([
   // Routes in src/app and src/pages
   "400", "404", "500", "account", "admin", "api", "bag", "checkout", "journal",
-  "men", "new-in", "products", "sign-in", "sign-up", "uploads", "women",
+  "men", "new-in", "products", "sign-in", "sign-up", "women",
   // public/ folder, and pages the store header already links to
   "assets", "client-services", "search",
 ]);

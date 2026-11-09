@@ -1,7 +1,7 @@
 // Catalogue access for the storefront. Reads products from Postgres; components
 // only ever see the Product shape below, never raw DB rows. Every read here is
 // limited to active products: staff reads are in src/lib/admin-products.ts.
-import { and, asc, desc, eq, inArray, ne, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, inArray, ne, or, sql } from "drizzle-orm";
 import { cacheLife, cacheTag } from "next/cache";
 import { db } from "@/db";
 import { categories, products } from "@/db/schema";
@@ -212,6 +212,43 @@ export async function getRelatedProducts(product: Product, limit = 4) {
       desc(products.createdAt),
     )
     .limit(limit);
+  return rows.map((row) =>
+    toProduct({ ...row.products, category: row.categories }),
+  );
+}
+
+export const SEARCH_QUERY_MAX_LENGTH = 100;
+const SEARCH_LIMIT = 48;
+
+// Active products where every word of the query appears in the name, category
+// or description, newest first. Callers trim and cap the query.
+export async function searchProducts(query: string) {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("products");
+
+  const words = query.split(/\s+/).filter(Boolean).slice(0, 8);
+  if (words.length === 0) return [];
+
+  const rows = await db
+    .select()
+    .from(products)
+    .innerJoin(categories, eq(products.categoryId, categories.id))
+    .where(
+      and(
+        isActive,
+        ...words.map((word) => {
+          const pattern = `%${word.replace(/[\\%_]/g, "\\$&")}%`;
+          return or(
+            ilike(products.name, pattern),
+            ilike(categories.name, pattern),
+            ilike(products.description, pattern),
+          );
+        }),
+      ),
+    )
+    .orderBy(desc(products.createdAt), desc(products.id))
+    .limit(SEARCH_LIMIT);
   return rows.map((row) =>
     toProduct({ ...row.products, category: row.categories }),
   );

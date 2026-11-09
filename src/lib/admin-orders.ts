@@ -147,7 +147,7 @@ export async function getOrderForAdmin(id: string) {
 }
 
 // Fulfilment steps by delivery method, in order
-const FULFILMENT_STEPS = {
+export const FULFILMENT_STEPS = {
   delivery: ["unfulfilled", "processing", "shipped", "delivered"],
   pickup: ["unfulfilled", "processing", "ready_for_pickup", "collected"],
 } as const satisfies Record<string, readonly FulfilmentStatus[]>;

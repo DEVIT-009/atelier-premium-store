@@ -22,9 +22,9 @@ import {
 import { parseDollars, slugFromText } from "@/lib/format";
 import {
   ImageRejectedError,
-  isLocalImage,
+  isUploadedImage,
   prepareUpload,
-  removeProductImages,
+  removeProductImage,
   saveProductImage,
   softDeleteProductImage,
   verifyImageUrl,
@@ -180,10 +180,10 @@ export async function createProductAction(
 
     const imageUrl = checked.upload ? await saveProductImage(id, checked.upload) : (choice as { url: string }).url;
     created = await createProduct({ ...parsed.data, id, slug, imageUrl }).catch(async (error: unknown) => {
-      await removeProductImages(id);
+      await removeProductImage(id);
       throw error;
     });
-    if (!created) await removeProductImages(id);
+    if (!created) await removeProductImage(id);
   } catch (error) {
     return failed(error);
   }
@@ -220,12 +220,12 @@ export async function updateProductAction(
         : currentUrl;
     await updateProduct(id, { ...parsed.data, imageUrl });
 
-    // The product no longer points at these, so a problem here isn't a failed save
-    if (checked.upload || (isLocalImage(currentUrl) && !isLocalImage(imageUrl))) {
-      await (checked.upload
-        ? removeProductImages(id, checked.upload.extension)
-        : softDeleteProductImage(id)
-      ).catch((error: unknown) => console.error("Could not clean up a replaced image", { id, error }));
+    // A new upload replaces the old file itself. The product no longer points at
+    // this one, so a problem here isn't a failed save.
+    if (isUploadedImage(currentUrl) && !isUploadedImage(imageUrl)) {
+      await softDeleteProductImage(id).catch((error: unknown) =>
+        console.error("Could not clean up a replaced image", { id, error }),
+      );
     }
   } catch (error) {
     if (error instanceof ProductChangedError) {

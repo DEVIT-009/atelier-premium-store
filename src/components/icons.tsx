@@ -76,3 +76,20 @@ export function ArrowRightIcon(props: SVGProps<SVGSVGElement>) {
     </Icon>
   );
 }
+
+export function CopyIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Icon width={16} height={16} {...props}>
+      <path d="M9 9h11v11H9z" />
+      <path d="M5 15H4V4h11v1" />
+    </Icon>
+  );
+}
+
+export function CheckIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Icon width={16} height={16} {...props}>
+      <path d="M4 12.5l5.5 5.5L20 6.5" />
+    </Icon>
+  );
+}

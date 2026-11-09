@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { Services } from "@/components/home/services";
 import { getSession } from "@/lib/session";
@@ -20,19 +21,7 @@ export default function AccountPage() {
   return (
     <>
       <section aria-labelledby="account-title" className="page pt-6 pb-(--section-y)">
-        <nav aria-label="Breadcrumb">
-          <ol className="flex flex-wrap items-center gap-2 text-caption text-muted uppercase">
-            <li>
-              <Link href="/" className="link-quiet">
-                Home
-              </Link>
-            </li>
-            <li aria-hidden="true">/</li>
-            <li aria-current="page" className="text-foreground">
-              My Account
-            </li>
-          </ol>
-        </nav>
+        <Breadcrumb crumbs={[{ label: "My Account" }]} />
 
         {/* The session lives in a cookie: read it inside Suspense */}
         <Suspense fallback={<AccountSkeleton />}>
@@ -83,7 +72,19 @@ async function AccountDetails() {
           </dl>
         </div>
 
-        <div className="col-span-4 lg:col-span-5 lg:col-start-8">
+        <div className="col-span-4 flex flex-col gap-4 lg:col-span-5 lg:col-start-8">
+          <div className="bg-surface p-6 lg:p-8">
+            <h2 className="eyebrow">Your Orders</h2>
+            <p className="mt-3 text-body-s text-muted">
+              Track your deliveries and review your past orders.
+            </p>
+            <div className="mt-6">
+              <Link href="/account/orders" prefetch={false} className="btn btn-primary">
+                View orders
+              </Link>
+            </div>
+          </div>
+
           <div className="bg-surface p-6 lg:p-8">
             <h2 className="eyebrow">Continue Shopping</h2>
             <p className="mt-3 text-body-s text-muted">

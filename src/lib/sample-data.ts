@@ -39,7 +39,7 @@ export const navigation = [
 ] as const;
 
 export const hero = {
-  eyebrow: "Autumn–Winter 2026",
+  eyebrow: "Autumn-Winter 2026",
   title: "Quiet Form",
   description:
     "Tailored outerwear, soft structure and the colors of a city in early winter.",
